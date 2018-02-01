@@ -111,22 +111,15 @@
 
 
 (setq bmx-keymap (let ((map (make-sparse-keymap)))
-                         (define-key map (kbd ":") #'bmx-insert-label)
-                         (define-key map (kbd "%") #'bmx-insert-variable)
-                         map))
+                   (define-key map (kbd ":") #'bmx-insert-label)
+                   (define-key map (kbd "%") #'bmx-insert-variable)
+                   map))
 
 (define-minor-mode bmx-mode
   "Small enhancements for editing batch-files."
   :lighter "bat-ide"
   :global nil
   :keymap bmx-keymap)
-
-
-;; (popup-menu '("a" "b" "c"))
-
-;; (company-complete)
-
-;; (setq edebug-on-error t)
 
 
 (provide 'bmx-mode)
