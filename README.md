@@ -11,6 +11,7 @@ The following features are currently provided:
 
 * Targeted auto-completion of `goto` and `call` labels.
 * Targeted auto-completion of environment-variables.
+* Looking up symbol at point (labels).
 
 ## status
 
