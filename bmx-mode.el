@@ -90,7 +90,27 @@
     (insert-char ?%)))
 
 (defun bmx--label-at-point ()
-  nil)
+  ;; look for declarations : from beginning of line, or invocations call/goto :
+  (save-excursion
+    ;; simplistic aproach: assume only one label per line!
+    (let ((eol (progn
+                 (move-end-of-line 1)
+                 (point))))
+      (move-beginning-of-line 1)
+      (if (search-forward-regexp ":\\([[:alnum:]_]+\\)" eol t 1)
+          (match-string-no-properties 1)
+        nil))))
+
+(defun bmx--find-label-references (label)
+  (let ((rx-label (regexp-quote label)))
+    (occur (concat "\\("
+            (concat ":"  rx-label "\\(\s\\|$\\)") ;; any usage with :label and nothing/space after
+            ;; usage without : ... must look for keyword identifiers!
+            (concat "\\|goto\s+" rx-label)
+            (concat "\\|call\s+" rx-label)
+            "\\)"))))
+
+;; test thingie :CALL_MEE
 
 (defun bmx--variable-at-point ()
   nil)
