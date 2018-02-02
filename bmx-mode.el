@@ -102,7 +102,8 @@
         nil))))
 
 (defun bmx--variable-at-point ()
-  nil)
+  (when (eq (face-at-point) 'font-lock-variable-name-face)
+    (substring-no-properties (symbol-name (symbol-at-point)))))
 
 (defun bmx--label-find-references (label)
   (let ((rx-label (regexp-quote label)))
@@ -113,31 +114,45 @@
                    (concat "\\|call\s+" rx-label)
                    "\\)"))))
 
-
 (defun bmx--label-navigate-to (label)
   (ring-insert find-tag-marker-ring (point-marker))
   (imenu (concat ":" label)))
 
+(defun bmx--variable-find-references (variable)
+  (let ((rx-variable (regexp-quote variable)))
+    (occur (concat "\\("
+                   (concat "set " rx-variable "=") ;; declarations
+                   "\\|"
+                   (concat "%" rx-variable "%") ;; usage
+                   "\\)"))))
+
+(defun bmx--variable-navigate-to (variable)
+  (ring-insert find-tag-marker-ring (point-marker))
+  (goto-char (point-min))
+  (search-forward-regexp (concat
+                          "set "
+                          (regexp-quote variable)
+                          "=")))
+
 ;; test thingie :CALL_MEE
-g
 
 (defun bmx-find-references-at-point ()
   (interactive)
-  (cond ((bmx--label-at-point) (bmx--label-find-references (bmx--label-at-point)))
-        ((bmx--variable-at-point) (bmx--variable-find-references (bmx--variable-at-point))
-         (t (message "No referencable symbol found at point!")))))
+  (cond ((bmx--variable-at-point) (bmx--variable-find-references (bmx--variable-at-point)))
+        ((bmx--label-at-point) (bmx--label-find-references (bmx--label-at-point)))
+        (t (message "No referencable symbol found at point!"))))
 
 (defun bmx-navigate-to-symbol-at-point ()
   (interactive)
-  (cond ((bmx--label-at-point) (bmx--label-navigate-to (bmx--label-at-point)))
-        ((bmx--variable-at-point) (bmx--variable-navigate-to (bmx--variable-at-point))
-         (t (message "No referencable symbol found at point!")))))
-
+  (cond ((bmx--variable-at-point) (bmx--variable-navigate-to (bmx--variable-at-point)))
+        ((bmx--label-at-point) (bmx--label-navigate-to (bmx--label-at-point)))
+        (t (message "No referencable symbol found at point!"))))
 
 (setq bmx-keymap (let ((map (make-sparse-keymap)))
                    (define-key map (kbd ":") #'bmx-insert-label)
                    (define-key map (kbd "%") #'bmx-insert-variable)
                    (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
+                   (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
                    map))
 
 (define-minor-mode bmx-mode
