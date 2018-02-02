@@ -89,8 +89,30 @@
         nil))))
 
 (defun bmx--variable-at-point ()
-  (when (eq (face-at-point) 'font-lock-variable-name-face)
-    (substring-no-properties (symbol-name (symbol-at-point)))))
+  (let ((eol))
+    (save-excursion
+      (move-end-of-line 1)
+      (setq eol (point)))
+
+    (save-excursion
+      (cond
+       ;; cursor at start of variable invocation |%var%
+       ((looking-at "%\\([[:alnum:]_]+\\)%")
+        (match-string-no-properties 1))
+
+       ;; cursor within a variable - %va|r%
+       ((looking-at "\\([[:alnum:]_]+\\)%")
+        (string-no-properties (symbol-name (symbol-at-point))))
+
+       ;; cursor within a variable - %var|%
+       ((looking-back "%\\([[:alnum:]_]+\\)")
+        (match-string-no-properties 1))
+
+       ;; line has variable declaration
+       ((progn
+          (beginning-of-line 1)
+          (search-forward-regexp "^set \\([[:alnum:]_]+\\)=" eol t 1))
+        (match-string-no-properties 1))))))
 
 (defun bmx--label-find-references (label)
   (let ((rx-label (regexp-quote label)))
