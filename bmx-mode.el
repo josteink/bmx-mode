@@ -63,8 +63,8 @@
     (interactive)
     (prefix (when
                 (and (equal major-mode 'bat-mode)
-                     (or (looking-back "call \\(:[a-zA-Z0-9_]+\\)\\>" 7)
-                         (looking-back "goto \\(:[a-zA-Z0-9_]+\\)\\>" 7)))
+                     (or (looking-back "call \\(:[a-zA-Z0-9_]*\\)" 7)
+                         (looking-back "goto \\(:[a-zA-Z0-9_]*\\)" 7)))
               (match-string 1)))
     (candidates (bmx--get-matching-labels arg))
     (meta (format "This value is named %s" arg))
