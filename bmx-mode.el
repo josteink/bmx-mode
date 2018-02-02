@@ -113,12 +113,11 @@
         (rx-unprefix (regexp-quote (bmx--label-unprefix label))))
 
     (occur (concat "\\("
-                   (concat "^" rx-label "\\(\s\\|$\\)") ;; any usage with :label and nothing/space after
+                   "^" rx-label "\\>" ;; any usage with :label and nothing/space after
                    ;; usage without : ... must look for keyword identifiers!
-                   (concat "\\|goto\s+" rx-label)
-                   (concat "\\|call\s+" rx-label)
-                   (concat "\\|goto\s+" rx-unprefix)
-                   (concat "\\|call\s+" rx-unprefix)
+                   "\\|"
+                   "\\(goto\\|call\\)\s+"
+                   "\\(" rx-label "\\|" rx-unprefix "\\)"
                    "\\)"))))
 
 (defun bmx--label-navigate-to (label)
