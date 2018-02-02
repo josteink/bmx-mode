@@ -117,8 +117,8 @@
                    ;; usage without : ... must look for keyword identifiers!
                    "\\|"
                    "\\(goto\\|call\\)\s+"
-                   "\\(" rx-label "\\|" rx-unprefix "\\)"
-                   "\\)"))))
+                   "\\(:?" rx-unprefix "\\)"
+                   "\\)\\>"))))
 
 (defun bmx--label-navigate-to (label)
   (ring-insert find-tag-marker-ring (point-marker))
