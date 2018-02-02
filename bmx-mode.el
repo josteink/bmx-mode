@@ -30,19 +30,6 @@
 (require 'popup)
 
 (defun bmx--get-labels ()
-;;   (if (eq "" prefix)
-;;       (bmx--get-labels)
-;;     (-filter (lambda (item)
-;;                (s-prefix-p prefix item t))
-;;              (bmx--get-labels))))
-
-;; (defun bmx--company-label-backend (command &optional arg &rest ignored)
-;;   (case command
-;;     (interactive (company-begin-backend #'my-company-batch-label-backend))
-;;     (prefix (and (or (looking-back "call :" 7)
-;;                      (looking-back "goto :" 7))))
-;;     (candidates (bmx--get-matching-labels arg))
-;;     (meta (format "This value is named %s" arg))))
   (save-excursion
     (goto-char (point-min))
 
@@ -64,6 +51,7 @@
     (insert-char ?:)))
 
 (defun bmx--get-variables ()
+  ;; TODO: include those found in `process-environment'?
   (save-excursion
     (goto-char (point-min))
 
