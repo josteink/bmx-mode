@@ -6,7 +6,7 @@
 ;; URL: http://github.com/josteink/bmx-mode
 ;; Version: 0.1
 ;; Keywords: bat-mode batch
-;; Package-Requires: ((cl-lib "0.5") (popup "0.5.3") (company "0.9.4")
+;; Package-Requires: ((cl-lib "0.5") (company "0.9.4")
 
 ;; This program is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 
 ;;; Code:
 
-(require 'popup)
 (ignore-errors
   (require 'company))
 
@@ -67,7 +66,7 @@
                 (and (equal major-mode 'bat-mode)
                      (or (looking-back "call :\\([a-zA-Z0-9_]+\\)\\>" 7)
                          (looking-back "goto :\\([a-zA-Z0-9_]+\\)\\>" 7)))
-               (concat ":" (match-string 1))))
+              (concat ":" (match-string 1))))
     (candidates (bmx--get-matching-labels arg))
     (meta (format "This value is named %s" arg))))
 
@@ -121,20 +120,30 @@
 
       (sort result 'string-lessp))))
 
-;; TODO: can be applied to company-mode instead? (completion will be scoped to % ?)
-(defun bmx-insert-variable ()
-  (interactive)
+(defun bmx--get-matching-variables (prefix)
+  (let ((prefixed (mapcar (lambda (item) (concat "%" item "%"))
+                          (bmx--get-variables))))
+    (if (eq "%" prefix)
+        prefixed
+      (-filter (lambda (item)
+                 (s-prefix-p prefix item t))
+               prefixed))))
 
-  ;; anything non-alpha
-  (if (or (looking-back " " 2)
-          (looking-back "\"" 2)
-          (looking-back "\\\\" 2)
-          (looking-back "-" 2))
-      (let ((choice (popup-menu* (bmx--get-variables))))
-        (insert-char ?%)
-        (insert choice)
-        (insert-char ?%))
-    (insert-char ?%)))
+(defun bmx--company-variable-backend (command &optional arg &rest ignored)
+  (case command
+    (prefix (when
+                (and (equal major-mode 'bat-mode)
+                     (looking-back "%\\([a-zA-Z0-9_]*\\)"))
+              (concat "%" (match-string 1))))
+    (candidates (bmx--get-matching-variables arg))
+    (meta (format "This value is named %s" arg))))
+
+(defun bmx--insert-percentage-and-complete ()
+  (interactive)
+  (insert ?%)
+  (company-manual-begin))
+
+
 
 (defun bmx--variable-at-point ()
   (let ((eol))
@@ -200,7 +209,7 @@
 
 (setq bmx-keymap (let ((map (make-sparse-keymap)))
                    (define-key map (kbd ":") #'bmx--insert-colon-and-complete)
-                   (define-key map (kbd "%") #'bmx-insert-variable)
+                   (define-key map (kbd "%") #'bmx--insert-percentage-and-complete)
                    (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
                    (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
                    map))
@@ -215,7 +224,8 @@
 (add-hook 'bat-mode-hook #'bmx-mode)
 
 (when (fboundp #'company-mode)
-  (add-to-list 'company-backends #'bmx--company-label-backend))
+  (add-to-list 'company-backends #'bmx--company-label-backend)
+  (add-to-list 'company-backends #'bmx--company-variable-backend))
 
 
 (provide 'bmx-mode)
