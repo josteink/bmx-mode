@@ -27,8 +27,21 @@
 
 ;;; Code:
 
-(ignore-errors
-  (require 'company))
+(require 'company)
+
+;;;
+;;; utility functions
+;;;
+
+(defun bmx--label-prefix (name)
+  (concat ":" name))
+
+;;;
+;;; consts
+;;;
+
+(defconst bmx--rx-label-invocation "\\<\\(call\\|goto\\)\s+\\(:[[:alnum:]_]*\\)")
+(defconst bmx--rx-label-declaration "^:\\([[:alnum:]_]+\\)\\>")
 
 ;;;
 ;;; labels
@@ -39,14 +52,13 @@
     (goto-char (point-min))
 
     (let ((result))
-      (while (search-forward-regexp "^:\\([a-zA-Z0-9_]+\\)\s*$" nil t nil)
+      (while (search-forward-regexp bmx--rx-label-declaration nil t nil)
         (add-to-list 'result (match-string-no-properties 1)))
 
       (sort result 'string-lessp))))
 
 (defun bmx--get-matching-labels (prefix)
-  (let ((prefixed (mapcar (lambda (item) (concat ":" item))
-                          (bmx--get-labels))))
+  (let ((prefixed (mapcar #'bmx--label-prefix (bmx--get-labels))))
     (if (eq ":" prefix)
         prefixed
       (-filter (lambda (item)
@@ -56,8 +68,7 @@
 (defun bmx--insert-colon-and-complete ()
   (interactive)
   (insert ?:)
-  (when (or (looking-back "call \\(:[a-zA-Z0-9_]*\\)")
-            (looking-back "goto \\(:[a-zA-Z0-9_]*\\)"))
+  (when (looking-back bmx--rx-label-invocation)
     (company-manual-begin)))
 
 (defun bmx--company-label-backend (command &optional arg &rest ignored)
@@ -65,9 +76,8 @@
     (interactive)
     (prefix (when
                 (and (equal major-mode 'bat-mode)
-                     (or (looking-back "call \\(:[a-zA-Z0-9_]*\\)")
-                         (looking-back "goto \\(:[a-zA-Z0-9_]*\\)")))
-              (match-string 1)))
+                     (looking-back bmx--rx-label-invocation))
+              (match-string 2)))
     (candidates (bmx--get-matching-labels arg))
     (meta (format "This value is named %s" arg))
     (ignore-case t)))
@@ -82,10 +92,10 @@
       (move-beginning-of-line 1)
 
       (cond
-       ((search-forward-regexp ":\\([[:alnum:]_]+\\)" eol t 1)
+       ((search-forward-regexp bmx--rx-label-declaration eol t 1)
         (match-string-no-properties 1))
 
-       ((search-forward-regexp "\\<\\(goto\\|call\\)\s+:?\\([[:alnum:]_]+\\)" eol t 1)
+       ((search-forward-regexp bmx--rx-label-invocation eol t 1)
         (match-string-no-properties 2))
 
        (t
@@ -225,10 +235,8 @@
 
 ;; tie it all up with bat-mode
 (add-hook 'bat-mode-hook #'bmx-mode)
-
-(when (fboundp #'company-mode)
-  (add-to-list 'company-backends #'bmx--company-label-backend)
-  (add-to-list 'company-backends #'bmx--company-variable-backend))
+(add-to-list 'company-backends #'bmx--company-label-backend)
+(add-to-list 'company-backends #'bmx--company-variable-backend)
 
 
 (provide 'bmx-mode)
