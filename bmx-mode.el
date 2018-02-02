@@ -62,9 +62,16 @@
                  (move-end-of-line 1)
                  (point))))
       (move-beginning-of-line 1)
-      (if (search-forward-regexp ":\\([[:alnum:]_]+\\)" eol t 1)
-          (match-string-no-properties 1)
-        nil))))
+
+      (cond
+       ((search-forward-regexp ":\\([[:alnum:]_]+\\)" eol t 1)
+        (match-string-no-properties 1))
+
+       ((search-forward-regexp "\\<\\(goto\\|call\\)\s+:?\\([[:alnum:]_]+\\)" eol t 1)
+        (match-string-no-properties 2))
+
+       (t
+        nil)))))
 
 (defun bmx--label-find-references (label)
   (let ((rx-label (regexp-quote label)))
