@@ -29,6 +29,10 @@
 
 (require 'popup)
 
+;;;
+;;; labels
+;;;
+
 (defun bmx--get-labels ()
   (save-excursion
     (goto-char (point-min))
@@ -49,6 +53,38 @@
          (popup-menu* (bmx--get-labels)))
         (insert " "))
     (insert-char ?:)))
+
+(defun bmx--label-at-point ()
+  ;; look for declarations : from beginning of line, or invocations call/goto :
+  (save-excursion
+    ;; simplistic aproach: assume only one label invocation per line!
+    (let ((eol (progn
+                 (move-end-of-line 1)
+                 (point))))
+      (move-beginning-of-line 1)
+      (if (search-forward-regexp ":\\([[:alnum:]_]+\\)" eol t 1)
+          (match-string-no-properties 1)
+        nil))))
+
+(defun bmx--label-find-references (label)
+  (let ((rx-label (regexp-quote label)))
+    (occur (concat "\\("
+                   (concat ":"  rx-label "\\(\s\\|$\\)") ;; any usage with :label and nothing/space after
+                   ;; usage without : ... must look for keyword identifiers!
+                   (concat "\\|goto\s+" rx-label)
+                   (concat "\\|call\s+" rx-label)
+                   "\\)"))))
+
+(defun bmx--label-navigate-to (label)
+  (ring-insert find-tag-marker-ring (point-marker))
+  (beginning-of-buffer)
+  (search-forward-regexp (concat "^:" (regexp-quote label) "\s*$"))
+  (beginning-of-line))
+
+
+;;;
+;;; variables
+;;;
 
 (defun bmx--get-variables ()
   ;; TODO: include those found in `process-environment'?
@@ -76,18 +112,6 @@
         (insert-char ?%))
     (insert-char ?%)))
 
-(defun bmx--label-at-point ()
-  ;; look for declarations : from beginning of line, or invocations call/goto :
-  (save-excursion
-    ;; simplistic aproach: assume only one label per line!
-    (let ((eol (progn
-                 (move-end-of-line 1)
-                 (point))))
-      (move-beginning-of-line 1)
-      (if (search-forward-regexp ":\\([[:alnum:]_]+\\)" eol t 1)
-          (match-string-no-properties 1)
-        nil))))
-
 (defun bmx--variable-at-point ()
   (let ((eol))
     (save-excursion
@@ -114,21 +138,6 @@
           (search-forward-regexp "^set \\([[:alnum:]_]+\\)=" eol t 1))
         (match-string-no-properties 1))))))
 
-(defun bmx--label-find-references (label)
-  (let ((rx-label (regexp-quote label)))
-    (occur (concat "\\("
-                   (concat ":"  rx-label "\\(\s\\|$\\)") ;; any usage with :label and nothing/space after
-                   ;; usage without : ... must look for keyword identifiers!
-                   (concat "\\|goto\s+" rx-label)
-                   (concat "\\|call\s+" rx-label)
-                   "\\)"))))
-
-(defun bmx--label-navigate-to (label)
-  (ring-insert find-tag-marker-ring (point-marker))
-  (beginning-of-buffer)
-  (search-forward-regexp (concat "^:" (regexp-quote label) "\s*$"))
-  (beginning-of-line))
-
 (defun bmx--variable-find-references (variable)
   (let ((rx-variable (regexp-quote variable)))
     (occur (concat "\\("
@@ -145,7 +154,9 @@
                           (regexp-quote variable)
                           "=")))
 
-;; test thingie :CALL_MEE
+;;
+;; general commands
+;;
 
 (defun bmx-find-references-at-point ()
   (interactive)
@@ -159,6 +170,10 @@
         ((bmx--label-at-point) (bmx--label-navigate-to (bmx--label-at-point)))
         (t (message "No referencable symbol found at point!"))))
 
+;;
+;; mode setup
+;;
+
 (setq bmx-keymap (let ((map (make-sparse-keymap)))
                    (define-key map (kbd ":") #'bmx-insert-label)
                    (define-key map (kbd "%") #'bmx-insert-variable)
@@ -171,6 +186,8 @@
   :lighter "bat-ide"
   :global nil
   :keymap bmx-keymap)
+
+;;(add-hook 'bat-mode-hook #'bmx-mode)
 
 
 (provide 'bmx-mode)
