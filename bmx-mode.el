@@ -27,18 +27,9 @@
 
 ;;; Code:
 
-(require 'imenu)
 (require 'popup)
 
 (defun bmx--get-labels ()
-  (let ((index (imenu--make-index-alist)))
-    (sort
-     (-filter (lambda (item)
-                (not (string-equal "*Rescan*" item)))
-              (mapcar #'car index))
-     'string-lessp)))
-
-;; (defun bmx--get-matching-labels (prefix)
 ;;   (if (eq "" prefix)
 ;;       (bmx--get-labels)
 ;;     (-filter (lambda (item)
@@ -52,6 +43,14 @@
 ;;                      (looking-back "goto :" 7))))
 ;;     (candidates (bmx--get-matching-labels arg))
 ;;     (meta (format "This value is named %s" arg))))
+  (save-excursion
+    (goto-char (point-min))
+
+    (let ((result))
+      (while (search-forward-regexp "^:\\([a-zA-Z0-9_]+\\)\s*$" nil t nil)
+        (add-to-list 'result (match-string-no-properties 1)))
+
+      (sort result 'string-lessp))))
 
 (defun bmx-insert-label ()
   (interactive)
@@ -116,7 +115,8 @@
 
 (defun bmx--label-navigate-to (label)
   (ring-insert find-tag-marker-ring (point-marker))
-  (imenu (concat ":" label)))
+  (search-forward-regexp (concat "^:" (regexp-quote label) "\s*$"))
+  (beginning-of-line))
 
 (defun bmx--variable-find-references (variable)
   (let ((rx-variable (regexp-quote variable)))
