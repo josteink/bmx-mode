@@ -104,7 +104,7 @@
 (defun bmx--label-find-references (label)
   (let ((rx-label (regexp-quote label)))
     (occur (concat "\\("
-                   (concat ":"  rx-label "\\(\s\\|$\\)") ;; any usage with :label and nothing/space after
+                   (concat "^" rx-label "\\(\s\\|$\\)") ;; any usage with :label and nothing/space after
                    ;; usage without : ... must look for keyword identifiers!
                    (concat "\\|goto\s+" rx-label)
                    (concat "\\|call\s+" rx-label)
@@ -113,7 +113,7 @@
 (defun bmx--label-navigate-to (label)
   (ring-insert find-tag-marker-ring (point-marker))
   (beginning-of-buffer)
-  (search-forward-regexp (concat "^:" (regexp-quote label) "\s*$"))
+  (search-forward-regexp (concat "^" (regexp-quote label) "\s*$"))
   (beginning-of-line))
 
 
