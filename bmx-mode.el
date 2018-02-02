@@ -45,14 +45,13 @@
       (sort result 'string-lessp))))
 
 (defun bmx--get-matching-labels (prefix)
-  (mapcar (lambda (item)
-            (concat ":" item))
-
-          (if (eq "" prefix)
-              (bmx--get-labels)
-            (-filter (lambda (item)
-                       (s-prefix-p prefix item t))
-                     (bmx--get-labels)))))
+  (let ((prefixed (mapcar (lambda (item) (concat ":" item))
+                          (bmx--get-labels))))
+    (if (eq ":" prefix)
+        prefixed
+      (-filter (lambda (item)
+                 (s-prefix-p prefix item t))
+               prefixed))))
 
 (defun bmx--insert-colon-and-complete ()
   (interactive)
@@ -61,14 +60,15 @@
 
 (defun bmx--company-label-backend (command &optional arg &rest ignored)
   (case command
-    (interactive (company-begin-backend #'my-company-batch-label-backend))
+    (interactive)
     (prefix (when
                 (and (equal major-mode 'bat-mode)
-                     (or (looking-back "call :\\([a-zA-Z0-9_]+\\)\\>" 7)
-                         (looking-back "goto :\\([a-zA-Z0-9_]+\\)\\>" 7)))
-              (concat ":" (match-string 1))))
+                     (or (looking-back "call \\(:[a-zA-Z0-9_]+\\)\\>" 7)
+                         (looking-back "goto \\(:[a-zA-Z0-9_]+\\)\\>" 7)))
+              (match-string 1)))
     (candidates (bmx--get-matching-labels arg))
-    (meta (format "This value is named %s" arg))))
+    (meta (format "This value is named %s" arg))
+    (ignore-case t)))
 
 (defun bmx--label-at-point ()
   ;; look for declarations : from beginning of line, or invocations call/goto :
@@ -133,10 +133,11 @@
   (case command
     (prefix (when
                 (and (equal major-mode 'bat-mode)
-                     (looking-back "%\\([a-zA-Z0-9_]*\\)"))
-              (concat "%" (match-string 1))))
+                     (looking-back "\\(%[a-zA-Z0-9_]*\\)"))
+              (match-string 1)))
     (candidates (bmx--get-matching-variables arg))
-    (meta (format "This value is named %s" arg))))
+    (meta (format "This value is named %s" arg))
+    (ignore-case t)))
 
 (defun bmx--insert-percentage-and-complete ()
   (interactive)
