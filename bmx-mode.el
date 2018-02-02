@@ -34,13 +34,20 @@
 ;;;
 
 (defun bmx--label-prefix (name)
-  (concat ":" name))
+  (if (string-equal (substring-no-properties name 0 1) ":")
+      name
+    (concat ":" name)))
+
+(defun bmx--label-unprefix (name)
+  (if (string-equal (substring-no-properties name 0 1) ":")
+      (substring-no-properties name 1)
+    name))
 
 ;;;
 ;;; consts
 ;;;
 
-(defconst bmx--rx-label-invocation "\\<\\(call\\|goto\\)\s+\\(:[[:alnum:]_]*\\)")
+(defconst bmx--rx-label-invocation "\\<\\(call\\|goto\\)\s+\\(:?[[:alnum:]_]*\\)")
 (defconst bmx--rx-label-declaration "^:\\([[:alnum:]_]+\\)\\>")
 
 ;;;
@@ -96,18 +103,22 @@
         (match-string-no-properties 1))
 
        ((search-forward-regexp bmx--rx-label-invocation eol t 1)
-        (match-string-no-properties 2))
+        (bmx--label-prefix (match-string-no-properties 2)))
 
        (t
         nil)))))
 
 (defun bmx--label-find-references (label)
-  (let ((rx-label (regexp-quote label)))
+  (let ((rx-label (regexp-quote label))
+        (rx-unprefix (regexp-quote (bmx--label-unprefix label))))
+
     (occur (concat "\\("
                    (concat "^" rx-label "\\(\s\\|$\\)") ;; any usage with :label and nothing/space after
                    ;; usage without : ... must look for keyword identifiers!
                    (concat "\\|goto\s+" rx-label)
                    (concat "\\|call\s+" rx-label)
+                   (concat "\\|goto\s+" rx-unprefix)
+                   (concat "\\|call\s+" rx-unprefix)
                    "\\)"))))
 
 (defun bmx--label-navigate-to (label)
