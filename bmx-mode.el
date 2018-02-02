@@ -125,6 +125,7 @@
 
 (defun bmx--label-navigate-to (label)
   (ring-insert find-tag-marker-ring (point-marker))
+  (beginning-of-buffer)
   (search-forward-regexp (concat "^:" (regexp-quote label) "\s*$"))
   (beginning-of-line))
 
@@ -138,7 +139,7 @@
 
 (defun bmx--variable-navigate-to (variable)
   (ring-insert find-tag-marker-ring (point-marker))
-  (goto-char (point-min))
+  (beginning-of-buffer)
   (search-forward-regexp (concat
                           "set "
                           (regexp-quote variable)
