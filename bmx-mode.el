@@ -6,7 +6,7 @@
 ;; URL: http://github.com/josteink/bmx-mode
 ;; Version: 0.1
 ;; Keywords: bat-mode batch
-;; Package-Requires: ((cl-lib "0.5") (popup "0.5.3")
+;; Package-Requires: ((cl-lib "0.5") (popup "0.5.3") (company "0.9.4")
 
 ;; This program is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@
 ;;; Code:
 
 (require 'popup)
+(ignore-errors
+  (require 'company))
 
 ;;;
 ;;; labels
@@ -43,16 +45,31 @@
 
       (sort result 'string-lessp))))
 
-(defun bmx-insert-label ()
-  (interactive)
+(defun bmx--get-matching-labels (prefix)
+  (mapcar (lambda (item)
+            (concat ":" item))
 
-  (if (or (looking-back "call " 6)
-          (looking-back "goto " 6))
-      (progn
-        (insert
-         (popup-menu* (bmx--get-labels)))
-        (insert " "))
-    (insert-char ?:)))
+          (if (eq "" prefix)
+              (bmx--get-labels)
+            (-filter (lambda (item)
+                       (s-prefix-p prefix item t))
+                     (bmx--get-labels)))))
+
+(defun bmx--insert-colon-and-complete ()
+  (interactive)
+  (insert ?:)
+  (company-manual-begin))
+
+(defun bmx--company-label-backend (command &optional arg &rest ignored)
+  (case command
+    (interactive (company-begin-backend #'my-company-batch-label-backend))
+    (prefix (when
+                (and (equal major-mode 'bat-mode)
+                     (or (looking-back "call :\\([a-zA-Z0-9_]+\\)\\>" 7)
+                         (looking-back "goto :\\([a-zA-Z0-9_]+\\)\\>" 7)))
+               (concat ":" (match-string 1))))
+    (candidates (bmx--get-matching-labels arg))
+    (meta (format "This value is named %s" arg))))
 
 (defun bmx--label-at-point ()
   ;; look for declarations : from beginning of line, or invocations call/goto :
@@ -182,7 +199,7 @@
 ;;
 
 (setq bmx-keymap (let ((map (make-sparse-keymap)))
-                   (define-key map (kbd ":") #'bmx-insert-label)
+                   (define-key map (kbd ":") #'bmx--insert-colon-and-complete)
                    (define-key map (kbd "%") #'bmx-insert-variable)
                    (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
                    (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
@@ -194,7 +211,11 @@
   :global nil
   :keymap bmx-keymap)
 
-;;(add-hook 'bat-mode-hook #'bmx-mode)
+;; tie it all up with bat-mode
+(add-hook 'bat-mode-hook #'bmx-mode)
+
+(when (fboundp #'company-mode)
+  (add-to-list 'company-backends #'bmx--company-label-backend))
 
 
 (provide 'bmx-mode)
