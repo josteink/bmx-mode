@@ -30,11 +30,32 @@
     (should (equal (bmx--get-matching-labels ":def" full-list)
                    '(":def")))))
 
+(ert-deftest label-at-point-works-at-point ()
+  (let ((test-cases '(("test-case 0" . (":PROPER"))
+                      ("test-case 1" . (":proper" ":proper" ":proper" ":PROPER"))
+                      ("test-case 2" . (":proper" ":PROPER" ":proper" ":PROPER")))))
+    (dolist (test-case test-cases)
+      (let ((buffer (find-file "./test-files/label-at-point.bat"))
+            (marker (car test-case))
+            (labels (cdr test-case)))
+        (beginning-of-buffer)
+
+        (search-forward marker)
+        (beginning-of-line 1)
+
+        (dolist (label labels)
+          (next-line 1)
+          (should (string-equal label (bmx--label-at-point))))
+
+        (kill-buffer buffer)))))
+
 (ert-deftest finds-references-correctly ()
   (let* ((buffer (find-file "./test-files/label-references.bat")))
     (bmx--label-find-references ":ABC")
     (switch-to-buffer "*Occur*")
     (assert (eq nil (search-forward ":ABCabc_123" nil t)))
+    (kill-buffer "*Occur*")
+    (kill-buffer buffer)
 
     ;; TODO testcase
     ;; Must find 
