@@ -31,9 +31,9 @@
                    '(":def")))))
 
 (ert-deftest label-at-point-works-at-point ()
-  (let ((test-cases '(("test-case 0" . (":PROPER"))
-                      ("test-case 1" . (":proper" ":proper" ":proper" ":PROPER"))
-                      ("test-case 2" . (":proper" ":PROPER" ":proper" ":PROPER")))))
+  (let ((test-cases '(("test-case 0" . (":PROPER0"))
+                      ("test-case 1" . (":proper1" ":proper2" ":proper3" ":PROPER4"))
+                      ("test-case 2" . (":proper5" ":PROPER6" ":proper7" ":PROPER8")))))
     (dolist (test-case test-cases)
       (let ((buffer (find-file "./test-files/label-at-point.bat"))
             (marker (car test-case))
@@ -44,10 +44,21 @@
         (beginning-of-line 1)
 
         (dolist (label labels)
+          (beginning-of-line)
           (next-line 1)
+          (should (string-equal label (bmx--label-at-point)))
+          (forward-char 5)
           (should (string-equal label (bmx--label-at-point))))
 
         (kill-buffer buffer)))))
+
+(ert-deftest label-at-point-handles-multiple-labels-on-same-line ()
+  (let ((buffer (find-file "test-files/label-at-point-multiple.bat")))
+    (beginning-of-buffer)
+    (search-forward ":")
+    (should (string-equal ":ckret" (bmx--label-at-point)))
+    (search-forward ":")
+    (should (string-equal ":copy_files" (bmx--label-at-point)))))
 
 (ert-deftest finds-references-correctly ()
   (let* ((buffer (find-file "./test-files/label-references.bat")))
@@ -58,9 +69,7 @@
     (kill-buffer buffer)
 
     ;; TODO testcase
-    ;; Must find 
+    ;; Must find
     ))
 
-
 (ert-run-tests-interactively t)
-

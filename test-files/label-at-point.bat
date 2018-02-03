@@ -1,14 +1,14 @@
 REM test-case 0
-:PROPER
+:PROPER0
 
 REM test-case 1 - simple one label invocation
-goto :proper
-GOTO :proper
-goto proper
-goto PROPER
+goto :proper1
+GOTO :proper2
+goto proper3
+goto PROPER4
 
 REM test-case 2 - simple one label invocation
-call :proper "abc"
-call :PROPER "abc"
-call proper "abc"
-call PROPER "abc"
+call :proper5 "abc"
+call :PROPER6 "abc"
+call proper7 "abc"
+call PROPER8 "abc"

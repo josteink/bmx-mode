@@ -88,23 +88,40 @@
     (ignore-case t)))
 
 (defun bmx--label-at-point ()
-  ;; look for declarations : from beginning of line, or invocations call/goto :
-  (save-excursion
-    ;; simplistic aproach: assume only one label invocation per line!
-    (let ((eol (progn
-                 (move-end-of-line 1)
-                 (point))))
-      (move-beginning-of-line 1)
+  (cond
+   ;; cursor within label used in invocation invocation
+   ((looking-back "\\(call\\|goto\\)\s+:?[[:alnum:]_]*")
+    (bmx--label-prefix
+     (string-no-properties
+      (symbol-name
+       (save-excursion
+         (or (symbol-at-point)
+             ;; in case we are at the :... in which case
+             ;; symbol is nil
+             (progn
+               (forward-char 1)
+               (symbol-at-point))))))))
 
-      (cond
-       ((search-forward-regexp bmx--rx-label-declaration eol t 1)
-        (match-string-no-properties 1))
+   ;; cursor on keyword used in invocation
+   ((or (string-equal "goto" (downcase (symbol-name (symbol-at-point))))
+        (string-equal "call" (downcase (symbol-name (symbol-at-point)))))
+    (save-excursion
+      (search-forward-regexp "\s")
+      (forward-word 1)
+      (bmx--label-prefix
+       (string-no-properties
+        (symbol-name
+         (symbol-at-point))))))
 
-       ((search-forward-regexp bmx--rx-label-invocation eol t 1)
-        (bmx--label-prefix (match-string-no-properties 2)))
+   ;; else: label declaration
+   ((save-excursion
+      (beginning-of-line 1)
+      (looking-at bmx--rx-label-declaration))
+    (match-string-no-properties 1))
 
-       (t
-        nil)))))
+   ;; nada
+   (t
+    nil)))
 
 (defun bmx--label-find-references (label)
   (let ((rx-label (regexp-quote label))
