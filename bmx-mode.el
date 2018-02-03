@@ -48,7 +48,7 @@
 ;;;
 
 (defconst bmx--rx-label-invocation "\\<\\(call\\|goto\\)\s+\\(:?[[:alnum:]_]*\\)")
-(defconst bmx--rx-label-declaration "^:\\([[:alnum:]_]+\\)\\>")
+(defconst bmx--rx-label-declaration "^\\(:[[:alnum:]_]+\\)\\>")
 
 ;;;
 ;;; labels
@@ -64,8 +64,8 @@
 
       (sort result 'string-lessp))))
 
-(defun bmx--get-matching-labels (prefix)
-  (let ((prefixed (mapcar #'bmx--label-prefix (bmx--get-labels))))
+(defun bmx--get-matching-labels (prefix &optional label-list)
+  (let ((prefixed (or label-list (bmx--get-labels))))
     (if (eq ":" prefix)
         prefixed
       (-filter (lambda (item)
