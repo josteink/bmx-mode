@@ -66,11 +66,9 @@
 
 (defun bmx--get-matching-labels (prefix &optional label-list)
   (let ((prefixed (or label-list (bmx--get-labels))))
-    (if (eq ":" prefix)
-        prefixed
-      (-filter (lambda (item)
-                 (s-prefix-p prefix item t))
-               prefixed))))
+    (-filter (lambda (item)
+               (s-prefix-p prefix item t))
+             prefixed)))
 
 (defun bmx--insert-colon-and-complete ()
   (interactive)
