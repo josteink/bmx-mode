@@ -68,10 +68,38 @@
     (switch-to-buffer "*Occur*")
     (assert (eq nil (search-forward ":ABCabc_123" nil t)))
     (kill-buffer "*Occur*")
-    (kill-buffer buffer)
+    (kill-buffer buffer)))
 
-    ;; TODO testcase
-    ;; Must find
-    ))
+;; TODO
+;; Navigation-based tests?
+
+;;;
+;;; variables tests
+;;;
+
+(ert-deftest can-normalize-variable ()
+  (should (string-equal "%foo%" (bmx--variable-normalize "%foo%")))
+  (should (string-equal "%foo%" (bmx--variable-normalize "foo"))))
+
+(ert-deftest can-unnormalize-variable ()
+  (should (string-equal "foo" (bmx--variable-unnormalize "%foo%")))
+  (should (string-equal "foo" (bmx--variable-unnormalize "foo"))))
+
+(ert-deftest gets-variable-references ()
+  (let* ((buffer (find-file "./test-files/variable-references.bat"))
+         (references (bmx--get-variables)))
+    ;; should be in sorted order!
+    (should (equal references '("%ABC%" "%ABCabc_123%" "%END%" "%MID%" "%START%")))
+    (kill-buffer buffer)))
+
+(ert-deftest filters-variables-correctly ()
+  (let* ((full-list '("%abc%" "%abcdef%" "%def%")))
+    (should (equal (bmx--get-matching-variables "%" full-list)
+                   full-list))
+    (should (equal (bmx--get-matching-variables "%abc" full-list)
+                   '("%abc%" "%abcdef%")))
+    ;; case insensitive match!
+    (should (equal (bmx--get-matching-variables "%DEF" full-list)
+                   '("%def%")))))
 
 (ert-run-tests-interactively t)

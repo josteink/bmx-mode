@@ -43,6 +43,15 @@
       (substring-no-properties name 1)
     name))
 
+(defun bmx--variable-normalize (name)
+  (if (string-equal (substring-no-properties name 0 1) "%")
+      name
+    (concat "%" name "%")))
+
+(defun bmx--variable-unnormalize (name)
+  (if (string-equal (substring-no-properties name 0 1) "%")
+      (substring-no-properties name 1 (- (length name) 1))
+    name))
 ;;;
 ;;; consts
 ;;;
@@ -153,18 +162,17 @@
 
     (let ((result))
       (while (search-forward-regexp "^set\s+\\([a-zA-Z0-9_]+\\)\s*=.*" nil t nil)
-        (add-to-list 'result (match-string-no-properties 1)))
+        (add-to-list 'result (bmx--variable-normalize (match-string-no-properties 1))))
 
       (sort result 'string-lessp))))
 
-(defun bmx--get-matching-variables (prefix)
-  (let ((prefixed (mapcar (lambda (item) (concat "%" item "%"))
-                          (bmx--get-variables))))
+(defun bmx--get-matching-variables (prefix &optional variables-list)
+  (let ((variables (or variables-list (bmx--get-variables))))
     (if (eq "%" prefix)
-        prefixed
+        variables
       (-filter (lambda (item)
                  (s-prefix-p prefix item t))
-               prefixed))))
+               variables))))
 
 (defun bmx--company-variable-backend (command &optional arg &rest ignored)
   (case command
