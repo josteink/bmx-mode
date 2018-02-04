@@ -99,7 +99,7 @@
 (defun bmx--label-at-point ()
   (cond
    ;; cursor within label used in invocation invocation
-   ((looking-back "\\(call\\|goto\\)\s+:?[[:alnum:]_]*")
+   ((looking-back bmx--rx-label-invocation)
     (bmx--label-prefix
      (string-no-properties
       (symbol-name
