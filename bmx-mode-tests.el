@@ -27,7 +27,8 @@
                    full-list))
     (should (equal (bmx--get-matching-labels ":abc" full-list)
                    '(":abc" ":abcdef")))
-    (should (equal (bmx--get-matching-labels ":def" full-list)
+    ;; case insensitive match!
+    (should (equal (bmx--get-matching-labels ":DEF" full-list)
                    '(":def")))))
 
 (ert-deftest label-at-point-works-at-point ()
@@ -58,7 +59,8 @@
     (search-forward ":")
     (should (string-equal ":ckret" (bmx--label-at-point)))
     (search-forward ":")
-    (should (string-equal ":copy_files" (bmx--label-at-point)))))
+    (should (string-equal ":copy_files" (bmx--label-at-point)))
+    (kill-buffer buffer)))
 
 (ert-deftest finds-references-correctly ()
   (let* ((buffer (find-file "./test-files/label-references.bat")))
