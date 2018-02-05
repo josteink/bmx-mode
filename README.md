@@ -14,6 +14,7 @@ The following features are currently provided:
   (System variables can be enabled through configuration/customization).
 * Looking up references for symbol at point (labels & variables).
 * Navigating to symbol at point (labels & variables).
+* Renaming symbol at point (labels & variables).
 
 ## status
 
