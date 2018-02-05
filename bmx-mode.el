@@ -170,12 +170,13 @@
              (car (split-string item "="))))
           process-environment))
 
-(defun bmx--get-variables ()
+(defun bmx--get-variables (&optional no-system-variables)
   (save-excursion
     (goto-char (point-min))
 
     (let ((result))
-      (when bmx-include-system-variables
+      (when (and (not no-system-variables)
+                 bmx-include-system-variables)
         (setq result (bmx--get-system-variables)))
 
       (while (search-forward-regexp "^set\s+\\([a-zA-Z0-9_]+\\)\s*=.*" nil t nil)
@@ -260,6 +261,48 @@
                           (regexp-quote (bmx--variable-unnormalize variable))
                           "=")))
 
+(defun bmx--variable-rename-prompt (variable)
+  (let* ((old-unnormialized (bmx--variable-unnormalize variable))
+         (new-name (read-input
+                    (concat
+                     "Enter new name for variable '"
+                     old-unnormialized
+                     "': ")))
+         (new-normalized (bmx--variable-normalize new-name)))
+    (cond
+     ((string-equal "" new-name)
+      (message "No name provided."))
+
+     ((member new-normalized (bmx--get-variables t))
+      (when (yes-or-no-p (concat "Variable '" new-name "' is already defined. Are you sure?"))
+        (bmx--variable-rename variable new-normalized)))
+
+     (t
+      (bmx--variable-rename variable new-normalized)))))
+
+(defun bmx--variable-rename (variable new-name)
+  (undo-boundary)
+
+  (message "Renaming variable '%s' to '%s'..." variable new-name)
+  (let ((old-unnormalized (bmx--variable-unnormalize variable))
+        (new-unnormalized (bmx--variable-unnormalize new-name)))
+
+    ;; rename declarations
+    (save-excursion
+      (beginning-of-buffer)
+      (while (re-search-forward
+              (concat "set\s+" (regexp-quote old-unnormalized) "=")
+              nil t)
+        (replace-match (concat "set " new-unnormalized "="))))
+
+    ;; rename invocations
+    (save-excursion
+      (beginning-of-buffer)
+      (while (re-search-forward
+              (concat "%" (regexp-quote old-unnormalized) "%")
+              nil t)
+        (replace-match (concat "%" new-unnormalized "%"))))))
+
 ;;
 ;; general commands
 ;;
@@ -276,6 +319,11 @@
         ((bmx--label-at-point) (bmx--label-navigate-to (bmx--label-at-point)))
         (t (message "No referencable symbol found at point!"))))
 
+(defun bmx-rename-symbol-at-point ()
+  (interactive)
+  (cond ((bmx--variable-at-point) (bmx--variable-rename-prompt (bmx--variable-at-point)))
+        ((bmx--label-at-point) (bmx--label-rename-prompt (bmx--label-at-point)))
+        (t (message "No referencable symbol found at point!"))))
 ;;
 ;; mode setup
 ;;
@@ -285,6 +333,7 @@
                    (define-key map (kbd "%") #'bmx--insert-percentage-and-complete)
                    (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
                    (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
+                   (define-key map (kbd "C-c C-r") #'bmx-rename-symbol-at-point)
                    map))
 
 (define-minor-mode bmx-mode
