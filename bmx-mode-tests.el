@@ -102,4 +102,12 @@
     (should (equal (bmx--get-matching-variables "%DEF" full-list)
                    '("%def%")))))
 
+(ert-deftest finds-variables-correctly ()
+  (let* ((buffer (find-file "./test-files/variable-references.bat")))
+    (bmx--label-find-references "%abc%")
+    (switch-to-buffer "*Occur*")
+    (assert (eq nil (search-forward "%ABCabc_123%" nil t)))
+    (kill-buffer "*Occur*")
+    (kill-buffer buffer)))
+
 (ert-run-tests-interactively t)
