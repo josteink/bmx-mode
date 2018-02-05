@@ -159,6 +159,55 @@
   (search-forward-regexp (concat "^" (regexp-quote label) "\s*$"))
   (beginning-of-line))
 
+(defun bmx--label-rename-prompt (label)
+  (let* ((old-unnormialized (bmx--label-unnormalize label))
+         (new-name (read-input
+                    (concat
+                     "Enter new name for label '"
+                     old-unnormialized
+                     "': ")))
+         (new-normalized (bmx--label-normalize new-name)))
+    (cond
+     ((string-equal "" new-name)
+      (message "No name provided."))
+
+     ((member new-normalized (bmx--get-labels))
+      (when (yes-or-no-p (concat "Label '" new-name "' is already defined. Are you sure?"))
+        (bmx--label-rename label new-normalized)))
+
+     (t
+      (bmx--label-rename label new-normalized)))))
+
+(defun bmx--label-rename (label new-name)
+  (undo-boundary)
+
+  (message "Renaming label '%s' to '%s'..." label new-name)
+  (let ((old-unnormalized (bmx--label-unnormalize label))
+        (new-unnormalized (bmx--label-unnormalize new-name)))
+
+    ;; rename declarations
+    (save-excursion
+      (beginning-of-buffer)
+      (while (re-search-forward
+              (concat "^:" (regexp-quote old-unnormalized) "\\>")
+              nil t)
+        (replace-match (concat ":" new-unnormalized ""))))
+
+    ;; rename GOTO invocations
+    (save-excursion
+      (beginning-of-buffer)
+      (while (re-search-forward
+              (concat "goto\s+:?" (regexp-quote old-unnormalized) "\\>")
+              nil t)
+        (replace-match (concat "goto :" new-unnormalized))))
+
+    ;; rename CALL invocations
+    (save-excursion
+      (beginning-of-buffer)
+      (while (re-search-forward
+              (concat "call\s+:?" (regexp-quote old-unnormalized) "\\>")
+              nil t)
+        (replace-match (concat "call :" new-unnormalized))))))
 
 ;;;
 ;;; variables
