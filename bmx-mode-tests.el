@@ -7,12 +7,12 @@
 ;;;
 
 (ert-deftest can-normalize-label ()
-  (should (string-equal ":foo" (bmx--label-prefix ":foo")))
-  (should (string-equal ":foo" (bmx--label-prefix "foo"))))
+  (should (string-equal ":foo" (bmx--label-normalize ":foo")))
+  (should (string-equal ":foo" (bmx--label-normalize "foo"))))
 
 (ert-deftest can-unnormalize-label ()
-  (should (string-equal "foo" (bmx--label-unprefix ":foo")))
-  (should (string-equal "foo" (bmx--label-unprefix "foo"))))
+  (should (string-equal "foo" (bmx--label-unnormalize ":foo")))
+  (should (string-equal "foo" (bmx--label-unnormalize "foo"))))
 
 (ert-deftest gets-label-references ()
   (let* ((buffer (find-file "./test-files/label-references.bat"))

@@ -42,12 +42,12 @@
 ;;; utility functions
 ;;;
 
-(defun bmx--label-prefix (name)
+(defun bmx--label-normalize (name)
   (if (string-equal (substring-no-properties name 0 1) ":")
       name
     (concat ":" name)))
 
-(defun bmx--label-unprefix (name)
+(defun bmx--label-unnormalize (name)
   (if (string-equal (substring-no-properties name 0 1) ":")
       (substring-no-properties name 1)
     name))
@@ -109,7 +109,7 @@
   (cond
    ;; cursor within label used in invocation invocation
    ((looking-back bmx--rx-label-invocation)
-    (bmx--label-prefix
+    (bmx--label-normalize
      (string-no-properties
       (symbol-name
        (save-excursion
@@ -126,7 +126,7 @@
     (save-excursion
       (search-forward-regexp "\s")
       (forward-word 1)
-      (bmx--label-prefix
+      (bmx--label-normalize
        (string-no-properties
         (symbol-name
          (symbol-at-point))))))
@@ -143,7 +143,7 @@
 
 (defun bmx--label-find-references (label)
   (let ((rx-label (regexp-quote label))
-        (rx-unprefix (regexp-quote (bmx--label-unprefix label))))
+        (rx-unprefix (regexp-quote (bmx--label-unnormalize label))))
 
     (occur (concat "\\("
                    "^" rx-label "\\>" ;; any usage with :label and nothing/space after
