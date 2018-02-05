@@ -187,8 +187,11 @@
 (defun bmx--insert-percentage-and-complete ()
   (interactive)
   (insert ?%)
-  (company-manual-begin))
 
+  ;; don't initiate auto-complete for manually typed variables
+  ;; not recognized by completion!
+  (when (not (looking-back "%\\([[:alnum:]_]+\\)%"))
+    (company-manual-begin)))
 
 
 (defun bmx--variable-at-point ()
