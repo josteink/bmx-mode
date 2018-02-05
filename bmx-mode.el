@@ -89,6 +89,7 @@
              prefixed)))
 
 (defun bmx--insert-colon-and-complete ()
+  "Insert a colon, and initiate syntax-completion when appropriate."
   (interactive)
   (insert ?:)
   (when (looking-back bmx--rx-label-invocation)
@@ -96,7 +97,6 @@
 
 (defun bmx--company-label-backend (command &optional arg &rest ignored)
   (case command
-    (interactive)
     (prefix (when
                 (and (equal major-mode 'bat-mode)
                      (looking-back bmx--rx-label-invocation))
@@ -357,18 +357,27 @@
 ;;
 
 (defun bmx-find-references-at-point ()
+  "Find all references to symbol at point and show them in an *Occur* buffer.
+
+Supports variables and labels."
   (interactive)
   (cond ((bmx--variable-at-point) (bmx--variable-find-references (bmx--variable-at-point)))
         ((bmx--label-at-point) (bmx--label-find-references (bmx--label-at-point)))
         (t (message "No referencable symbol found at point!"))))
 
 (defun bmx-navigate-to-symbol-at-point ()
+  "Navigate to the symbol at point.
+
+Supports variables and labels."
   (interactive)
   (cond ((bmx--variable-at-point) (bmx--variable-navigate-to (bmx--variable-at-point)))
         ((bmx--label-at-point) (bmx--label-navigate-to (bmx--label-at-point)))
         (t (message "No referencable symbol found at point!"))))
 
 (defun bmx-rename-symbol-at-point ()
+  "Rename the the symbol at point.
+
+Supports variables and labels."
   (interactive)
   (cond ((bmx--variable-at-point) (bmx--variable-rename-prompt (bmx--variable-at-point)))
         ((bmx--label-at-point) (bmx--label-rename-prompt (bmx--label-at-point)))
