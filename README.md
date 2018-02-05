@@ -11,6 +11,7 @@ The following features are currently provided:
 
 * Targeted auto-completion of `goto` and `call` labels.
 * Targeted auto-completion of environment-variables.
+  (System variables can be enabled through configuration/customization).
 * Looking up references for symbol at point (labels & variables).
 * Navigating to symbol at point (labels & variables).
 

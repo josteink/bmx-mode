@@ -30,6 +30,15 @@
 (require 'company)
 
 ;;;
+;;; customizations
+;;;
+
+(defcustom bmx-include-system-variables nil
+  "If enabled includes system-variables in variable-completion."
+  :type 'boolean
+  :group 'bmx-mode)
+
+;;;
 ;;; utility functions
 ;;;
 
@@ -155,12 +164,20 @@
 ;;; variables
 ;;;
 
+(defun bmx--get-system-variables ()
+  (mapcar (lambda (item)
+            (bmx--variable-normalize
+             (car (split-string item "="))))
+          process-environment))
+
 (defun bmx--get-variables ()
-  ;; TODO: include those found in `process-environment'?
   (save-excursion
     (goto-char (point-min))
 
     (let ((result))
+      (when bmx-include-system-variables
+        (setq result (bmx--get-system-variables)))
+
       (while (search-forward-regexp "^set\s+\\([a-zA-Z0-9_]+\\)\s*=.*" nil t nil)
         (add-to-list 'result (bmx--variable-normalize (match-string-no-properties 1))))
 
