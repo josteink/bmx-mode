@@ -181,9 +181,9 @@
 (defun bmx--label-rename (label new-name)
   (undo-boundary)
 
-  (message "Renaming label '%s' to '%s'..." label new-name)
   (let ((old-unnormalized (bmx--label-unnormalize label))
         (new-unnormalized (bmx--label-unnormalize new-name)))
+    (message "Renaming label '%s' to '%s'..." old-unnormalized new-unnormalized)
 
     ;; rename declarations
     (save-excursion
@@ -208,6 +208,12 @@
               (concat "call\s+:?" (regexp-quote old-unnormalized) "\\>")
               nil t)
         (replace-match (concat "call :" new-unnormalized))))))
+
+(defun bmx-fixup-labels ()
+  "Ensure all label-usage is using a consistent casing and syntax."
+  (interactive)
+  (dolist (label (bmx--get-labels))
+    (bmx--label-rename label label)))
 
 ;;;
 ;;; variables
@@ -332,9 +338,9 @@
 (defun bmx--variable-rename (variable new-name)
   (undo-boundary)
 
-  (message "Renaming variable '%s' to '%s'..." variable new-name)
   (let ((old-unnormalized (bmx--variable-unnormalize variable))
         (new-unnormalized (bmx--variable-unnormalize new-name)))
+    (message "Renaming variable '%s' to '%s'..." old-unnormalized new-unnormalized)
 
     ;; rename declarations
     (save-excursion
@@ -351,6 +357,13 @@
               (concat "%" (regexp-quote old-unnormalized) "%")
               nil t)
         (replace-match (concat "%" new-unnormalized "%"))))))
+
+(defun bmx-fixup-variables ()
+  "Ensure all variable-usage is using a consistent casing and syntax."
+  (interactive)
+
+  (dolist (variable (bmx--get-variables t))
+    (bmx--variable-rename variable variable)))
 
 ;;
 ;; general commands
@@ -382,6 +395,13 @@ Supports variables and labels."
   (cond ((bmx--variable-at-point) (bmx--variable-rename-prompt (bmx--variable-at-point)))
         ((bmx--label-at-point) (bmx--label-rename-prompt (bmx--label-at-point)))
         (t (message "No referencable symbol found at point!"))))
+
+(defun bmx-fixup-labels-and-variables ()
+  "Ensure all label and variable-usage is using a consistent casing and syntax."
+  (interactive)
+  (bmx-fixup-labels)
+  (bmx-fixup-variables))
+
 ;;
 ;; mode setup
 ;;
@@ -392,6 +412,7 @@ Supports variables and labels."
                    (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
                    (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
                    (define-key map (kbd "C-c C-r") #'bmx-rename-symbol-at-point)
+                   (define-key map (kbd "C-c C-f") #'bmx-fixup-labels-and-variables)
                    map))
 
 (define-minor-mode bmx-mode

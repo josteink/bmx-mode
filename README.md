@@ -15,6 +15,7 @@ The following features are currently provided:
 * Looking up references for symbol at point (labels & variables).
 * Navigating to symbol at point (labels & variables).
 * Renaming symbol at point (labels & variables).
+* Fixup file to use consistent label and variable-references and syntax.
 
 ## status
 
