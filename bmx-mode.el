@@ -5,7 +5,7 @@
 ;; Author: Jostein Kjønigsen <jostein@gmail.com>
 ;; URL: http://github.com/josteink/bmx-mode
 ;; Version: 0.1
-;; Keywords: bat-mode batch
+;; Keywords: c convenience tools
 ;; Package-Requires: ((cl-lib "0.5") (company "0.9.4"))
 
 ;; This program is free software: you can redistribute it and/or modify it
@@ -24,6 +24,9 @@
 ;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
+
+;; This minor-mode is cross-platform and does not depend on any native
+;; platform tools.
 
 ;;; Code:
 
