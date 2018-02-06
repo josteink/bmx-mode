@@ -417,6 +417,7 @@ Supports variables and labels."
                    (define-key map (kbd "C-c C-f") #'bmx-fixup-labels-and-variables)
                    map))
 
+;;;###autoload
 (define-minor-mode bmx-mode
   "Small enhancements for editing batch-files."
   :lighter "bat-ide"
@@ -424,9 +425,11 @@ Supports variables and labels."
   :keymap bmx-keymap)
 
 ;; tie it all up with bat-mode
-(add-hook 'bat-mode-hook #'bmx-mode)
-(add-to-list 'company-backends #'bmx--company-label-backend)
-(add-to-list 'company-backends #'bmx--company-variable-backend)
+;;;###autoload
+(progn
+  (add-hook 'bat-mode-hook #'bmx-mode)
+  (add-to-list 'company-backends #'bmx--company-label-backend)
+  (add-to-list 'company-backends #'bmx--company-variable-backend))
 
 
 (provide 'bmx-mode)
