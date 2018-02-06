@@ -93,7 +93,7 @@
                (s-prefix-p prefix item t))
              prefixed)))
 
-(defun bmx--insert-colon-and-complete ()
+(defun bmx-insert-colon-and-complete ()
   "Insert a colon, and initiate syntax-completion when appropriate."
   (interactive)
   (insert ?:)
@@ -262,7 +262,8 @@
     (meta (format "This value is named %s" arg))
     (ignore-case t)))
 
-(defun bmx--insert-percentage-and-complete ()
+(defun bmx-insert-percentage-and-complete ()
+  "Insert a percentage-sign and initiate completion, if reasonable."
   (interactive)
   (insert ?%)
 
@@ -412,8 +413,8 @@ Supports variables and labels."
 ;;
 
 (setq bmx-keymap (let ((map (make-sparse-keymap)))
-                   (define-key map (kbd ":") #'bmx--insert-colon-and-complete)
-                   (define-key map (kbd "%") #'bmx--insert-percentage-and-complete)
+                   (define-key map (kbd ":") #'bmx-insert-colon-and-complete)
+                   (define-key map (kbd "%") #'bmx-insert-percentage-and-complete)
                    (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
                    (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
                    (define-key map (kbd "C-c C-r") #'bmx-rename-symbol-at-point)
