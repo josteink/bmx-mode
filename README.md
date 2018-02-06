@@ -1,6 +1,10 @@
 
 # bmx-mode
 
+[![Build Status](https://api.travis-ci.org/josteink/bmx-mode.svg?branch=master)](https://travis-ci.org/josteink/bmx-mode)
+
+Action-paced batch-file editing, powered by Emacs!
+
 Batch Mode eXtras, or bmx for short is an Emacs-package which aims to
 extend Emacs' built in `bat-mode`, to improve editing of Windows
 BATCH-files.
