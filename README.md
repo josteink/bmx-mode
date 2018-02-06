@@ -3,23 +3,31 @@
 
 [![Build Status](https://api.travis-ci.org/josteink/bmx-mode.svg?branch=master)](https://travis-ci.org/josteink/bmx-mode)
 
-Action-paced batch-file editing, powered by Emacs!
+![logo](https://raw.githubusercontent.com/josteink/bmx-mode/master/logo.png)
+
+Action-paced Windows Batch-file editing, powered by [GNU Emacs](https://www.gnu.org/software/emacs/)!
 
 Batch Mode eXtras, or bmx for short is an Emacs-package which aims to
 extend Emacs' built in `bat-mode`, to improve editing of Windows
-BATCH-files.
+Batch-files.
 
 ## features
 
 The following features are currently provided:
 
-* Targeted auto-completion of `goto` and `call` labels.
-* Targeted auto-completion of environment-variables.
-  (System variables can be enabled through configuration/customization).
-* Looking up references for symbol at point (labels & variables).
-* Navigating to symbol at point (labels & variables).
-* Renaming symbol at point (labels & variables).
-* Fixup file to use consistent label and variable-references and syntax.
+* Code-completion for labels and environment-variables based on [company-mode](https://company-mode.github.io/) (`C-.`).
+* Seamless code-navigation using established Emacs-conventions (`M-,` and `M-.`).
+* Looking up references to any symbol (`Shift-f12`).
+* Renaming of code-symbols (`C-c C-r`).
+* Fixup file to use consistent casing and syntax for all variables and labels (`C-c C-f`).
+
+## configuration/customization
+
+Install it and you should be done. `bmx-mode` is plug-n-play and shouldn't need any configuration to work properly.
+
+That said the following aspects can be customized using standard Emacs-customization (`M-x customize-group<RET>bmx-mode`).
+
+* Toggle completion of system-variables (default `off`)
 
 ## status
 
