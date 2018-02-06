@@ -6,7 +6,7 @@
 ;; URL: http://github.com/josteink/bmx-mode
 ;; Version: 0.1
 ;; Keywords: bat-mode batch
-;; Package-Requires: ((cl-lib "0.5") (company "0.9.4")
+;; Package-Requires: ((cl-lib "0.5") (company "0.9.4"))
 
 ;; This program is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
