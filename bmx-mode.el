@@ -112,7 +112,7 @@
    ;; cursor within label used in invocation invocation
    ((looking-back bmx--rx-label-invocation)
     (bmx--label-normalize
-     (string-no-properties
+     (substring-no-properties
       (symbol-name
        (save-excursion
          (or (symbol-at-point)
@@ -129,7 +129,7 @@
       (search-forward-regexp "\s")
       (forward-word 1)
       (bmx--label-normalize
-       (string-no-properties
+       (substring-no-properties
         (symbol-name
          (symbol-at-point))))))
 
@@ -285,7 +285,7 @@
        ;; cursor within a variable - %va|r%
        ((looking-at "\\([[:alnum:]_]+\\)%")
         (bmx--variable-normalize
-         (string-no-properties (symbol-name (symbol-at-point)))))
+         (substring-no-properties (symbol-name (symbol-at-point)))))
 
        ;; cursor at end of a variable - %var|%
        ((and (looking-at "@")
