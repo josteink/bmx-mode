@@ -1,4 +1,4 @@
-EMACS=$(shell which emacs) -Q -batch -L .WORKDIR=/tmp/emacs_tide
+EMACS=$(shell which emacs) -Q -batch -L .
 WORKDIR=/tmp/bmx-mode
 export HOME := $(WORKDIR)
 

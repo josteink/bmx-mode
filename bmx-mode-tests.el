@@ -1,5 +1,17 @@
 
 (require 'ert)
+
+
+;; development only packages, not declared as a package-dependency
+(package-initialize)
+(add-to-list 'package-archives '("melpa" . "https://stable.melpa.org/packages/"))
+
+;; we depend on lots of stuff.
+(dolist (p '(s dash company))
+  (when (not (require p nil t))
+    (package-refresh-contents)
+    (package-install p)))
+
 (require 'bmx-mode)
 
 ;;;
@@ -66,7 +78,7 @@
   (let* ((buffer (find-file "./test-files/label-references.bat")))
     (bmx--label-find-references ":ABC")
     (switch-to-buffer "*Occur*")
-    (assert (eq nil (search-forward ":ABCabc_123" nil t)))
+    (should (eq nil (search-forward ":ABCabc_123" nil t)))
     (kill-buffer "*Occur*")
     (kill-buffer buffer)))
 
@@ -106,8 +118,8 @@
   (let* ((buffer (find-file "./test-files/variable-references.bat")))
     (bmx--label-find-references "%abc%")
     (switch-to-buffer "*Occur*")
-    (assert (eq nil (search-forward "%ABCabc_123%" nil t)))
+    (should (eq nil (search-forward "%ABCabc_123%" nil t)))
     (kill-buffer "*Occur*")
     (kill-buffer buffer)))
 
-(ert-run-tests-interactively t)
+;; (ert-run-tests-interactively t)

@@ -28,6 +28,8 @@
 ;;; Code:
 
 (require 'company)
+(require 'dash)
+(require 's)
 
 ;;;
 ;;; customizations
