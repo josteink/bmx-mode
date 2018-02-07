@@ -1,5 +1,5 @@
 set START="start"
-set MID="mid"   
+if exist "moo" set MID="mid"   
 set ABC=ABC
 set ABCabc_123="ABCabc123"
 

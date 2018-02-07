@@ -239,18 +239,16 @@
                  bmx-include-system-variables)
         (setq result (bmx--get-system-variables)))
 
-      (while (search-forward-regexp "^set\s+\\([a-zA-Z0-9_]+\\)\s*=.*" nil t nil)
+      (while (search-forward-regexp "\\<set\s+\\([a-zA-Z0-9_]+\\)\s*=.*" nil t nil)
         (add-to-list 'result (bmx--variable-normalize (match-string-no-properties 1))))
 
       (sort result 'string-lessp))))
 
 (defun bmx--get-matching-variables (prefix &optional variables-list)
   (let ((variables (or variables-list (bmx--get-variables))))
-    (if (eq "%" prefix)
-        variables
-      (-filter (lambda (item)
-                 (s-prefix-p prefix item t))
-               variables))))
+    (-filter (lambda (item)
+               (s-prefix-p prefix item t))
+             variables)))
 
 (defun bmx--company-variable-backend (command &optional arg &rest ignored)
   (case command
