@@ -27,14 +27,14 @@
   (should (string-equal "foo" (bmx--label-unnormalize "foo"))))
 
 (ert-deftest gets-label-references ()
-  (let* ((buffer (find-file "./test-files/label-references.bat"))
-         (references (bmx--get-labels)))
+  (let ((buffer (find-file "./test-files/label-references.bat"))
+        (references (bmx--get-labels)))
     ;; should be in sorted order!
     (should (equal references '(":ABC" ":ABCabc_123" ":END" ":MID" ":START")))
     (kill-buffer buffer)))
 
 (ert-deftest filters-labels-correctly ()
-  (let* ((full-list '(":abc" ":abcdef" ":def")))
+  (let ((full-list '(":abc" ":abcdef" ":def")))
     (should (equal (bmx--get-matching-labels ":" full-list)
                    full-list))
     (should (equal (bmx--get-matching-labels ":abc" full-list)
@@ -44,12 +44,12 @@
                    '(":def")))))
 
 (ert-deftest label-at-point-works-at-point ()
-  (let ((test-cases '(("test-case 0" . (":PROPER0"))
+  (let ((buffer (find-file "./test-files/label-at-point.bat"))
+        (test-cases '(("test-case 0" . (":PROPER0"))
                       ("test-case 1" . (":proper1" ":proper2" ":proper3" ":PROPER4"))
                       ("test-case 2" . (":proper5" ":PROPER6" ":proper7" ":PROPER8")))))
     (dolist (test-case test-cases)
-      (let ((buffer (find-file "./test-files/label-at-point.bat"))
-            (marker (car test-case))
+      (let ((marker (car test-case))
             (labels (cdr test-case)))
         (beginning-of-buffer)
 
@@ -61,9 +61,9 @@
           (next-line 1)
           (should (string-equal label (bmx--label-at-point)))
           (forward-char 5)
-          (should (string-equal label (bmx--label-at-point))))
+          (should (string-equal label (bmx--label-at-point))))))
 
-        (kill-buffer buffer)))))
+    (kill-buffer buffer)))
 
 (ert-deftest label-at-point-handles-multiple-labels-on-same-line ()
   (let ((buffer (find-file "test-files/label-at-point-multiple.bat")))
@@ -75,7 +75,7 @@
     (kill-buffer buffer)))
 
 (ert-deftest finds-references-correctly ()
-  (let* ((buffer (find-file "./test-files/label-references.bat")))
+  (let ((buffer (find-file "./test-files/label-references.bat")))
     (bmx--label-find-references ":ABC")
     (switch-to-buffer "*Occur*")
     (should (eq nil (search-forward ":ABCabc_123" nil t)))
@@ -114,11 +114,59 @@
     (should (equal (bmx--get-matching-variables "%DEF" full-list)
                    '("%def%")))))
 
+(ert-deftest variable-at-point-works-at-point ()
+  (let ((buffer (find-file "./test-files/variable-at-point.bat"))
+        (test-cases '(("test-case 0" . ("%PROPER0%"))
+                      ("test-case 1" . ("%proper1%"))
+                      ("test-case 2" . ("%proper2%"))
+                      ("test-case 3" . ("%proper3%" "%proper4%"))
+                      ("test-case 4" . ("%proper5%")))))
+    (dolist (test-case test-cases)
+      (let ((marker (car test-case))
+            (variables (cdr test-case)))
+        (beginning-of-buffer)
+
+        (search-forward marker)
+        (beginning-of-line 1)
+        (next-line 1)
+        (forward-word 2)
+
+        (dolist (variable variables)
+          (should (string-equal variable (bmx--variable-at-point)))
+          (forward-word 1))))
+
+    (kill-buffer buffer)))
+
+(ert-deftest can-navigate-to-variables ()
+  (let ((buffer (find-file "./test-files/variable-navigation.txt"))
+        (test-cases '(("test-case 1" . "variable1")
+                      ("test-case 2" . "variable2")
+                      ("test-case 3" . "variable3"))))
+
+    (dolist (test-case test-cases)
+      (let ((marker (car test-case))
+            (variable (cdr test-case)))
+        (beginning-of-buffer)
+        (search-forward marker)
+
+        (let ((expected-point (- (search-forward "value") 5)))
+          (bmx--variable-navigate-to variable)
+          (should (= expected-point (point))))))))
+
 (ert-deftest finds-variables-correctly ()
-  (let* ((buffer (find-file "./test-files/variable-references.bat")))
-    (bmx--label-find-references "%abc%")
+  (let ((buffer (find-file "./test-files/variable-references.bat")))
+    (bmx--variable-find-references "%abc%")
     (switch-to-buffer "*Occur*")
     (should (eq nil (search-forward "%ABCabc_123%" nil t)))
+    (should (not (eq nil (search-forward "%ABC%"))))
+    (kill-buffer "*Occur*")
+    (kill-buffer buffer)))
+
+(ert-deftest finds-variables-with-quoted-syntax-correctly ()
+  (let ((buffer (find-file "./test-files/variable-references.bat")))
+    (bmx--variable-find-references "%end%")
+    (switch-to-buffer "*Occur*")
+    (should (not (eq nil (search-forward "set \"end=end\"" nil t))))
     (kill-buffer "*Occur*")
     (kill-buffer buffer)))
 

@@ -239,7 +239,14 @@
                  bmx-include-system-variables)
         (setq result (bmx--get-system-variables)))
 
+      ;; regular unquoted syntax
+      ;; set "var=value"
       (while (search-forward-regexp "\\<set\s+\\([a-zA-Z0-9_]+\\)\s*=.*" nil t nil)
+        (add-to-list 'result (bmx--variable-normalize (match-string-no-properties 1))))
+
+      ;; variables also support a quoted set syntax
+      ;; set "var=value"
+      (while (search-forward-regexp "\\<set\s+\"\\([a-zA-Z0-9_]+\\)\s*=.*\"" nil t nil)
         (add-to-list 'result (bmx--variable-normalize (match-string-no-properties 1))))
 
       (sort result 'string-lessp))))
@@ -290,7 +297,7 @@
          (substring-no-properties (symbol-name (symbol-at-point)))))
 
        ;; cursor at end of a variable - %var|%
-       ((and (looking-at "@")
+       ((and (looking-at "%")
              (looking-back "%\\([[:alnum:]_]+\\)"))
         (bmx--variable-normalize
          (match-string-no-properties 1)))
@@ -298,16 +305,17 @@
        ;; line has variable declaration
        ((progn
           (beginning-of-line 1)
-          (search-forward-regexp "^set\s+\\([[:alnum:]_]+\\)=" eol t 1))
+          (search-forward-regexp "^set\s+\"?\\([[:alnum:]_]+\\)=" eol t 1))
         (bmx--variable-normalize
          (match-string-no-properties 1)))))))
 
 (defun bmx--variable-find-references (variable)
-  (let ((rx-unnormalized
+  (let ((search-upper-case nil)
+        (rx-unnormalized
          (regexp-quote
           (bmx--variable-unnormalize variable))))
     (occur (concat "\\("
-                   (concat "set\s+" rx-unnormalized "=") ;; declarations
+                   (concat "set\s+\"?" rx-unnormalized "=") ;; declarations
                    "\\|"
                    (concat "%" rx-unnormalized "%") ;; usage
                    "\\)"))))
@@ -316,7 +324,7 @@
   (ring-insert find-tag-marker-ring (point-marker))
   (beginning-of-buffer)
   (search-forward-regexp (concat
-                          "set\s+"
+                          "set\s+\"?"
                           (regexp-quote (bmx--variable-unnormalize variable))
                           "=")))
 

@@ -8,4 +8,6 @@ echo %ABCabc_123%
 echo %MID%
 echo %NOT_EXIST%
 
-SET END=end
+echo %END%
+set "END=end"
+set END=end
