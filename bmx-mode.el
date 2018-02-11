@@ -296,9 +296,14 @@
         (bmx--variable-normalize
          (substring-no-properties (symbol-name (symbol-at-point)))))
 
-       ;; cursor at end of a variable - %var|%
+       ;; cursor at end of a variable name - %var|%
        ((and (looking-at "%")
              (looking-back "%\\([[:alnum:]_]+\\)"))
+        (bmx--variable-normalize
+         (match-string-no-properties 1)))
+
+       ;; cursor at end of a variable invocation - %var%|
+       ((looking-back "%\\([[:alnum:]_]+\\)%")
         (bmx--variable-normalize
          (match-string-no-properties 1)))
 
