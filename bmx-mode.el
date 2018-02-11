@@ -33,6 +33,7 @@
 (require 'company)
 (require 'dash)
 (require 's)
+(require 'ring)
 
 ;;;
 ;;; customizations
@@ -160,7 +161,7 @@
 
 (defun bmx--label-navigate-to (label)
   (ring-insert find-tag-marker-ring (point-marker))
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (search-forward-regexp (concat "^" (bmx--label-normalize (regexp-quote label)) "\s*$"))
   (beginning-of-line))
 
@@ -192,7 +193,7 @@
 
     ;; rename declarations
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (while (re-search-forward
               (concat "^:" (regexp-quote old-unnormalized) "\\>")
               nil t)
@@ -200,7 +201,7 @@
 
     ;; rename GOTO invocations
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (while (re-search-forward
               (concat "goto\s+:?" (regexp-quote old-unnormalized) "\\>")
               nil t)
@@ -208,7 +209,7 @@
 
     ;; rename CALL invocations
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (while (re-search-forward
               (concat "call\s+:?" (regexp-quote old-unnormalized) "\\>")
               nil t)
@@ -327,7 +328,7 @@
 
 (defun bmx--variable-navigate-to (variable)
   (ring-insert find-tag-marker-ring (point-marker))
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (search-forward-regexp (concat
                           "set\s+\"?"
                           (regexp-quote (bmx--variable-unnormalize variable))
@@ -361,7 +362,7 @@
 
     ;; rename declarations
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (while (re-search-forward
               (concat "set\s+" (regexp-quote old-unnormalized) "=")
               nil t)
@@ -369,7 +370,7 @@
 
     ;; rename invocations
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (while (re-search-forward
               (concat "%" (regexp-quote old-unnormalized) "%")
               nil t)
