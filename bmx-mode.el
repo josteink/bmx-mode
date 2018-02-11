@@ -161,7 +161,7 @@
 (defun bmx--label-navigate-to (label)
   (ring-insert find-tag-marker-ring (point-marker))
   (beginning-of-buffer)
-  (search-forward-regexp (concat "^" (regexp-quote label) "\s*$"))
+  (search-forward-regexp (concat "^" (bmx--label-normalize (regexp-quote label)) "\s*$"))
   (beginning-of-line))
 
 (defun bmx--label-rename-prompt (label)

@@ -65,6 +65,26 @@
 
     (kill-buffer buffer)))
 
+(ert-deftest can-navigate-to-label ()
+  (let ((buffer (find-file "./test-files/label-navigation.bat"))
+        (test-cases '(("test-case 1" . ":LABEL1")
+                      ("test-case 2" . "LABEL2")
+                      ("test-case 3" . "label3"))))
+
+    (dolist (test-case test-cases)
+      (let ((marker (car test-case))
+            (label (cdr test-case)))
+        (beginning-of-buffer)
+        (search-forward marker)
+        (beginning-of-line 1)
+        (next-line 1)
+
+        (let ((expected-point (point)))
+          (beginning-of-buffer)
+          (bmx--label-navigate-to label)
+          (beginning-of-line 1)
+          (should (= expected-point (point))))))))
+
 (ert-deftest label-at-point-handles-multiple-labels-on-same-line ()
   (let ((buffer (find-file "test-files/label-at-point-multiple.bat")))
     (beginning-of-buffer)
@@ -81,9 +101,6 @@
     (should (eq nil (search-forward ":ABCabc_123" nil t)))
     (kill-buffer "*Occur*")
     (kill-buffer buffer)))
-
-;; TODO
-;; Navigation-based tests?
 
 ;;;
 ;;; variables tests
@@ -140,7 +157,7 @@
 (ert-deftest can-navigate-to-variables ()
   (let ((buffer (find-file "./test-files/variable-navigation.bat"))
         (test-cases '(("test-case 1" . "variable1")
-                      ("test-case 2" . "variable2")
+                      ("test-case 2" . "VARIABLE2")
                       ("test-case 3" . "variable3"))))
 
     (dolist (test-case test-cases)
