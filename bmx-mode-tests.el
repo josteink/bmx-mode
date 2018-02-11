@@ -138,7 +138,7 @@
     (kill-buffer buffer)))
 
 (ert-deftest can-navigate-to-variables ()
-  (let ((buffer (find-file "./test-files/variable-navigation.txt"))
+  (let ((buffer (find-file "./test-files/variable-navigation.bat"))
         (test-cases '(("test-case 1" . "variable1")
                       ("test-case 2" . "variable2")
                       ("test-case 3" . "variable3"))))
