@@ -98,14 +98,14 @@
   "Insert a colon, and initiate syntax-completion when appropriate."
   (interactive)
   (insert ?:)
-  (when (looking-back bmx--rx-label-invocation)
+  (when (looking-back bmx--rx-label-invocation nil)
     (company-manual-begin)))
 
 (defun bmx--company-label-backend (command &optional arg &rest ignored)
   (case command
     (prefix (when
                 (and (equal major-mode 'bat-mode)
-                     (looking-back bmx--rx-label-invocation))
+                     (looking-back bmx--rx-label-invocation nil))
               (match-string 2)))
     (candidates (bmx--get-matching-labels arg))
     (meta (format "This value is named %s" arg))
@@ -114,7 +114,7 @@
 (defun bmx--label-at-point ()
   (cond
    ;; cursor within label used in invocation invocation
-   ((looking-back bmx--rx-label-invocation)
+   ((looking-back bmx--rx-label-invocation nil)
     (bmx--label-normalize
      (substring-no-properties
       (symbol-name
@@ -262,7 +262,7 @@
   (case command
     (prefix (when
                 (and (equal major-mode 'bat-mode)
-                     (looking-back "\\(%[a-zA-Z0-9_]*\\)"))
+                     (looking-back "\\(%[a-zA-Z0-9_]*\\)" nil))
               (match-string 1)))
     (candidates (bmx--get-matching-variables arg))
     (meta (format "This value is named %s" arg))
@@ -275,7 +275,7 @@
 
   ;; don't initiate auto-complete for manually typed variables
   ;; not recognized by completion!
-  (when (not (looking-back "%\\([[:alnum:]_]+\\)%"))
+  (when (not (looking-back "%\\([[:alnum:]_]+\\)%" nil))
     (company-manual-begin)))
 
 
@@ -299,12 +299,12 @@
 
        ;; cursor at end of a variable name - %var|%
        ((and (looking-at "%")
-             (looking-back "%\\([[:alnum:]_]+\\)"))
+             (looking-back "%\\([[:alnum:]_]+\\)" nil))
         (bmx--variable-normalize
          (match-string-no-properties 1)))
 
        ;; cursor at end of a variable invocation - %var%|
-       ((looking-back "%\\([[:alnum:]_]+\\)%")
+       ((looking-back "%\\([[:alnum:]_]+\\)%" nil)
         (bmx--variable-normalize
          (match-string-no-properties 1)))
 
