@@ -39,6 +39,10 @@
 ;;; customizations
 ;;;
 
+(defgroup bmx-mode nil
+  "bmx-mode: Extensions to Emacs' built-in bat-mode."
+  :group 'prog-mode)
+
 (defcustom bmx-include-system-variables nil
   "If enabled includes system-variables in variable-completion."
   :type 'boolean
