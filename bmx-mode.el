@@ -437,14 +437,14 @@ Supports variables and labels."
   (add-to-list 'company-backends #'bmx--company-label-backend)
   (add-to-list 'company-backends #'bmx--company-variable-backend))
 
-(setq bmx-keymap (let ((map (make-sparse-keymap)))
-                   (define-key map (kbd ":") #'bmx-insert-colon-and-complete)
-                   (define-key map (kbd "%") #'bmx-insert-percentage-and-complete)
-                   (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
-                   (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
-                   (define-key map (kbd "C-c C-r") #'bmx-rename-symbol-at-point)
-                   (define-key map (kbd "C-c C-f") #'bmx-fixup-labels-and-variables)
-                   map))
+(defvar bmx-keymap (let ((map (make-sparse-keymap)))
+                     (define-key map (kbd ":") #'bmx-insert-colon-and-complete)
+                     (define-key map (kbd "%") #'bmx-insert-percentage-and-complete)
+                     (define-key map (kbd "M-.") #'bmx-navigate-to-symbol-at-point)
+                     (define-key map (kbd "<S-f12>") #'bmx-find-references-at-point)
+                     (define-key map (kbd "C-c C-r") #'bmx-rename-symbol-at-point)
+                     (define-key map (kbd "C-c C-f") #'bmx-fixup-labels-and-variables)
+                     map))
 
 ;;;###autoload
 (define-minor-mode bmx-mode
