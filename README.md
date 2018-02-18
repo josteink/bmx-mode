@@ -23,7 +23,14 @@ The following features are currently provided:
 
 ## configuration/customization
 
-Install it and you should be done. `bmx-mode` is plug-n-play and shouldn't need any configuration to work properly.
+Install it and plug it into your `.emacs` and you should be done:
+
+````elisp
+(require 'bmx-mode)
+(bmx-mode-setup-defaults)
+````
+
+No further configuration should be needed to work properly.
 
 That said the following aspects can be customized using standard Emacs-customization (`M-x customize-group<RET>bmx-mode`).
 

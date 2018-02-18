@@ -431,6 +431,12 @@ Supports variables and labels."
 ;; mode setup
 ;;
 
+(defun bmx-mode-setup-defaults ()
+  "Configure default-settings for `bmx-mode'."
+  (add-hook 'bat-mode-hook #'bmx-mode)
+  (add-to-list 'company-backends #'bmx--company-label-backend)
+  (add-to-list 'company-backends #'bmx--company-variable-backend))
+
 (setq bmx-keymap (let ((map (make-sparse-keymap)))
                    (define-key map (kbd ":") #'bmx-insert-colon-and-complete)
                    (define-key map (kbd "%") #'bmx-insert-percentage-and-complete)
@@ -447,12 +453,6 @@ Supports variables and labels."
   :global nil
   :keymap bmx-keymap)
 
-;; tie it all up with bat-mode
-;;;###autoload
-(progn
-  (add-hook 'bat-mode-hook #'bmx-mode)
-  (add-to-list 'company-backends #'bmx--company-label-backend)
-  (add-to-list 'company-backends #'bmx--company-variable-backend))
 
 
 (provide 'bmx-mode)
