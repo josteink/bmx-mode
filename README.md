@@ -21,6 +21,13 @@ The following features are currently provided:
 * Renaming of code-symbols (`C-c C-r`).
 * Fixup file to use consistent casing and syntax for all variables and labels (`C-c C-f`).
 
+
+## installation
+
+`bmx-mode` is packaged and available from MELPA. Install it the usual way:
+
+`M-x package-install<RET>bmx-mode<RET>`
+
 ## configuration/customization
 
 Install it and plug it into your `.emacs` and you should be done:
