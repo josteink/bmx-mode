@@ -45,7 +45,7 @@ That said the following aspects can be customized using standard Emacs-customiza
 
 ## status
 
-While fully usable, this mode is currently under development and is
-not packaged/finalized, not prepared for publishing on
-package-repositories like MELPA.
+While fully usable, this mode is currently under development and there may be bugs.
+
+If so feel free to report them, or even better: Provide PRs!
 
