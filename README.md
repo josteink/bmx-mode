@@ -11,7 +11,7 @@ Batch Mode eXtras, or bmx for short is an Emacs-package which aims to
 extend Emacs' built in `bat-mode`, to improve editing of Windows
 Batch-files.
 
-## features
+## Features
 
 The following features are currently provided:
 
@@ -22,20 +22,26 @@ The following features are currently provided:
 * Fixup file to use consistent casing and syntax for all variables and labels (`C-c C-f`).
 
 
-## installation
+## Installation
 
 `bmx-mode` is packaged and available from MELPA. Install it the usual way:
 
 `M-x package-install<RET>bmx-mode<RET>`
 
-## configuration/customization
+## Configuration/Customization
 
 Install it and plug it into your `.emacs` and you should be done:
 
-````elisp
+``` elisp
 (require 'bmx-mode)
 (bmx-mode-setup-defaults)
-````
+```
+or use `use-package`:
+
+``` elisp
+(use-package bmx-mode
+    :config (bmx-mode-setup-defaults))
+```
 
 No further configuration should be needed to work properly.
 
@@ -43,7 +49,7 @@ That said the following aspects can be customized using standard Emacs-customiza
 
 * Toggle completion of system-variables (default `off`)
 
-## status
+## Status
 
 While fully usable, this mode is currently under development and there may be bugs.
 
