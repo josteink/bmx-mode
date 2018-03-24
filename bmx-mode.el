@@ -449,6 +449,7 @@ Supports variables and labels."
 ;; mode setup
 ;;
 
+;;;###autoload
 (defun bmx-mode-setup-defaults ()
   "Configure default-settings for `bmx-mode'."
   (add-hook 'bat-mode-hook #'bmx-mode)
