@@ -80,6 +80,12 @@
   (if (string-equal (substring-no-properties name 0 1) "%")
       (substring-no-properties name 1 (- (length name) 1))
     name))
+
+(defun bmx--read-input (prompt)
+  (if (fboundp 'read-input)
+      (read-input prompt)
+    (read-string prompt)))
+
 ;;;
 ;;; consts
 ;;;
@@ -192,7 +198,7 @@
 
 (defun bmx--label-rename-prompt (label)
   (let* ((old-unnormialized (bmx--label-unnormalize label))
-         (new-name (read-input
+         (new-name (bmx--read-input
                     (concat
                      "Enter new name for label '"
                      old-unnormialized
@@ -361,7 +367,7 @@
 
 (defun bmx--variable-rename-prompt (variable)
   (let* ((old-unnormialized (bmx--variable-unnormalize variable))
-         (new-name (read-input
+         (new-name (bmx--read-input
                     (concat
                      "Enter new name for variable '"
                      old-unnormialized
