@@ -192,7 +192,7 @@
 
 (defun bmx--label-rename-prompt (label)
   (let* ((old-unnormialized (bmx--label-unnormalize label))
-         (new-name (read-input
+         (new-name (read-string
                     (concat
                      "Enter new name for label '"
                      old-unnormialized
@@ -361,7 +361,7 @@
 
 (defun bmx--variable-rename-prompt (variable)
   (let* ((old-unnormialized (bmx--variable-unnormalize variable))
-         (new-name (read-input
+         (new-name (read-string
                     (concat
                      "Enter new name for variable '"
                      old-unnormialized
