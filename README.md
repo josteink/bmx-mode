@@ -1,7 +1,7 @@
 
 # bmx-mode
 
-[![Build Status](https://api.travis-ci.org/josteink/bmx-mode.svg?branch=master)](https://travis-ci.org/josteink/bmx-mode)
+![CI](https://github.com/josteink/bmx-mode/workflows/CI/badge.svg)
 
 ![logo](https://raw.githubusercontent.com/josteink/bmx-mode/master/logo.png)
 
